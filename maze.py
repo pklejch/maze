@@ -6,9 +6,48 @@ class solution:
     def __init__(self, shape):
         self.distances = numpy.zeros(shape)
         self.directions = numpy.zeros(shape)
-        self.is_reachable = False
+        self.is_reachable = True
     def path(self, row, column):
-        pass
+        path = list()
+
+
+        #im am in the wall
+        if self.distances[row][column] == -1:
+            raise Exception
+
+
+        #load content
+        content = self.directions[row][column]
+
+
+        #im right at finnish, add start and end point
+        if content == b'X':
+            path.append([row, column])
+            path.append([row, column])
+            return path
+
+
+        #follow directions until the end
+        while content != b'X':
+            path.append([row, column])
+            if content == b'>':
+                content = self.directions[row][column + 1]
+                column+=1
+            elif content == b'v':
+                content = self.directions[row + 1][column]
+                row+=1
+            elif content == b'<':
+                content = self.directions[row][column - 1]
+                column-=1
+            elif content == b'^':
+                content = self.directions[row - 1][column]
+                row-=1
+
+        #add finnish cell
+        path.append([row,column])
+
+        return path
+
 
 class pathSolver:
     def __init__(self,shape):
@@ -86,7 +125,7 @@ def calculateDistances(array):
 
 def calculateDirections(array):
     (rows, cols) = array.shape
-    matrix = numpy.full((rows, cols), 35)
+    matrix = numpy.full((rows, cols), '#', dtype=('a',1))
     for i in range(1, rows-1):
         for j in range(1, cols-1):
             content = array[i][j]
@@ -104,20 +143,27 @@ def calculateDirections(array):
             if i > 0:
                 contentU = array[i-1][j]
 
+            #wall
             if content == -1:
-                matrix[i][j] = 35
+                matrix[i][j] = '#'
+            #finnish
             elif content == 0:
-                matrix[i][j] = 88
+                matrix[i][j] = 'X'
+            #innacesible
             elif content == -2:
-                matrix[i][j] = 32
+                matrix[i][j] = ' '
+            #<
             elif content-1 == contentL:
-                matrix[i][j] = 60
+                matrix[i][j] = '<'
+            #>
             elif content-1 == contentR:
-                matrix[i][j] = 62
+                matrix[i][j] = '>'
+            #v
             elif content-1 == contentD:
-                matrix[i][j] = 118
+                matrix[i][j] = 'v'
+            #^
             elif content-1 == contentU:
-                matrix[i][j] = 94
+                matrix[i][j] = '^'
 
     return matrix
 
@@ -127,6 +173,16 @@ def analyze(array):
 
     sol.distances = calculateDistances(array)
     sol.directions = calculateDirections(sol.distances)
+
+
+
+    #check if reachable
+    if -2 in sol.distances:
+        sol.is_reachable = False
+
+    #replace inaccesible parts with -1
+    sol.distances[sol.distances == -2 ] = -1
+
     return sol
 
 
@@ -137,7 +193,19 @@ def analyze(array):
 
 if __name__ == "__main__":
     from generate import maze
-    maze = maze(25, 20, density=.75)
+    #maze = maze(15, 10)
+    maze=numpy.array([
+ [-1 ,-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
+ [-1 , 2 , 2 , 2 , 2 , 2 , 2 , 2  ,2 , 2 , 2 , 2 , 2 , 2, -1],
+ [-1 , 2 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 , 2 ,-1],
+ [-1 , 2 ,-1 , 1 ,-1 , 2 ,-1 , 2 , 2 , 2 , 2 , 2 ,-1 , 2 ,-1],
+ [-1 , 2 ,-1 , 2 ,-1 , 2 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 , 2 ,-1],
+ [-1 , 2 ,-1 , 2 , 2 , 2 , 2 , 2 , 2 , 2 , 2 , 2 , 2 , 2 ,-1],
+ [-1 , 2 ,-1 , 2 ,-1 ,-1 ,-1 , 2 ,-1 ,-1 ,-1 , 2 ,-1  ,2 ,-1],
+ [-1 , 2 , 2 , 2 ,-1 , 2 , 2 , 2 ,-1 , 2 ,-1 , 2 ,-1 , 2 ,-1],
+ [-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 , 2 ,-1 ,-1 ,-1 , 2 ,-1],
+ [-1 , 2 , 2 , 2 , 2 , 2 , 2 , 2 , 2 , 2 , 2 , 2 , 2 , 2 ,-1],
+ [-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1]])
     pyplot.imshow(maze,interpolation='nearest')
     pyplot.xticks([]), pyplot.yticks([])
     pyplot.savefig("maze.png")
@@ -148,19 +216,6 @@ if __name__ == "__main__":
     (rows, cols) = maze.shape
 
     for i in range(0, rows):
-        for j in range(0, cols):
-            if sol.directions[i][j] == 35:
-                print("#",end="")
-            if sol.directions[i][j] == 88:
-                print("X", end="")
-            if sol.directions[i][j] == 60:
-                print("<", end="")
-            if sol.directions[i][j] == 62:
-                print(">", end="")
-            if sol.directions[i][j] == 94:
-                    print("^", end="")
-            if sol.directions[i][j] == 118:
-                    print("v", end="")
-            if sol.directions[i][j] == 32:
-                    print(" ", end="")
-        print()
+        print ("".join([item.decode('ascii') for item in sol.directions[i]]))
+    print(sol.is_reachable)
+    print(sol.path(9,13))
