@@ -1,6 +1,5 @@
 import numpy
-from matplotlib import pyplot
-import binascii
+
 
 class solution:
     def __init__(self, shape):
@@ -10,24 +9,20 @@ class solution:
     def path(self, row, column):
         path = list()
 
-
-        #im am in the wall
+        # im am in the wall
         if self.distances[row][column] == -1:
             raise Exception
 
-
-        #load content
+        # load content
         content = self.directions[row][column]
 
-
-        #im right at finnish, add start and end point
+        # im right at finnish, add start and end point
         if content == b'X':
             path.append([row, column])
             path.append([row, column])
             return path
 
-
-        #follow directions until the end
+        # follow directions until the end
         while content != b'X':
             path.append([row, column])
             if content == b'>':
@@ -43,7 +38,7 @@ class solution:
                 content = self.directions[row - 1][column]
                 row-=1
 
-        #add finnish cell
+        # add finnish cell
         path.append([row,column])
 
         return path
@@ -55,19 +50,18 @@ class pathSolver:
 
     def path(self, maze, x, y, distance, first):
 
-        #wall or visited
+        # wall or visited
         if maze[x][y] < 0:
             return
 
-        #finnish
+        # finnish
         elif maze[x][y] == 1:
             if distance < self.bestDistance or self.bestDistance == -2:
                 self.bestDistance = distance
             return
 
-        #visited
+        # visited
         maze[x][y] = -2
-
 
         if first == "R":
             # go right, down, left, up
@@ -112,16 +106,18 @@ class pathSolver:
 
 def calculateDistances(array):
     (rows, cols) = array.shape
-    matrix = numpy.full((rows, cols), -1)
+    matrix = numpy.empty((rows, cols), dtype=int)
+    matrix[...] = -1
     for i in range(1, rows-1):
         for j in range(1, cols-1):
             solver = pathSolver(array.shape)
             for mode in ["R","D","L","U"]:
                 solver.path(numpy.copy(array),i,j,0,mode)
-            #if i have better solution and its open path (or inaccesible part)
+            # if i have better solution and its open path (or inaccesible part)
             if (matrix[i][j] > solver.bestDistance or matrix[i][j] == -1 ) and (array[i][j] >= 0):
                 matrix[i][j] = solver.bestDistance
     return matrix
+
 
 def calculateDirections(array):
     (rows, cols) = array.shape
@@ -134,34 +130,34 @@ def calculateDirections(array):
             contentL = None
             contentR = None
 
-            if j < maze.shape[1] - 1:
+            if j < cols - 1:
                 contentR=array[i][j+1]
-            if i < maze.shape[0] - 1:
+            if i < rows - 1:
                 contentD = array[i+1][j]
             if j > 0:
                 contentL = array[i][j-1]
             if i > 0:
                 contentU = array[i-1][j]
 
-            #wall
+            # wall
             if content == -1:
                 matrix[i][j] = '#'
-            #finnish
+            # finnish
             elif content == 0:
                 matrix[i][j] = 'X'
-            #innacesible
+            # innacesible
             elif content == -2:
                 matrix[i][j] = ' '
-            #<
+            # <
             elif content-1 == contentL:
                 matrix[i][j] = '<'
-            #>
+            # >
             elif content-1 == contentR:
                 matrix[i][j] = '>'
-            #v
+            # v
             elif content-1 == contentD:
                 matrix[i][j] = 'v'
-            #^
+            # ^
             elif content-1 == contentU:
                 matrix[i][j] = '^'
 
@@ -174,48 +170,48 @@ def analyze(array):
     sol.distances = calculateDistances(array)
     sol.directions = calculateDirections(sol.distances)
 
-
-
-    #check if reachable
+    # check if reachable
     if -2 in sol.distances:
         sol.is_reachable = False
 
-    #replace inaccesible parts with -1
+    # replace inaccesible parts with -1
     sol.distances[sol.distances == -2 ] = -1
 
     return sol
 
 
-
-
-
-
-
 if __name__ == "__main__":
     from generate import maze
-    #maze = maze(15, 10)
-    maze=numpy.array([
- [-1 ,-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
- [-1 , 2 , 2 , 2 , 2 , 2 , 2 , 2  ,2 , 2 , 2 , 2 , 2 , 2, -1],
- [-1 , 2 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 , 2 ,-1],
- [-1 , 2 ,-1 , 1 ,-1 , 2 ,-1 , 2 , 2 , 2 , 2 , 2 ,-1 , 2 ,-1],
- [-1 , 2 ,-1 , 2 ,-1 , 2 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 , 2 ,-1],
- [-1 , 2 ,-1 , 2 , 2 , 2 , 2 , 2 , 2 , 2 , 2 , 2 , 2 , 2 ,-1],
- [-1 , 2 ,-1 , 2 ,-1 ,-1 ,-1 , 2 ,-1 ,-1 ,-1 , 2 ,-1  ,2 ,-1],
- [-1 , 2 , 2 , 2 ,-1 , 2 , 2 , 2 ,-1 , 2 ,-1 , 2 ,-1 , 2 ,-1],
- [-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 , 2 ,-1 ,-1 ,-1 , 2 ,-1],
- [-1 , 2 , 2 , 2 , 2 , 2 , 2 , 2 , 2 , 2 , 2 , 2 , 2 , 2 ,-1],
- [-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1]])
+    from matplotlib import pyplot
+    maze = maze(15, 10)
+ #    maze=numpy.array([
+ # [-1 ,-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
+ # [-1 , 2 , 2 , 2 , 2 , 2 , 2 , 2  ,2 , 2 , 2 , 2 , 2 , 2, -1],
+ # [-1 , 2 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 , 2 ,-1],
+ # [-1 , 2 ,-1 , 1 ,-1 , 2 ,-1 , 2 , 2 , 2 , 2 , 2 ,-1 , 2 ,-1],
+ # [-1 , 2 ,-1 , 2 ,-1 , 2 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 , 2 ,-1],
+ # [-1 , 2 ,-1 , 2 , 2 , 2 , 2 , 2 , 2 , 2 , 2 , 2 , 2 , 2 ,-1],
+ # [-1 , 2 ,-1 , 2 ,-1 ,-1 ,-1 , 2 ,-1 ,-1 ,-1 , 2 ,-1  ,2 ,-1],
+ # [-1 , 2 , 2 , 2 ,-1 , 2 , 2 , 2 ,-1 , 2 ,-1 , 2 ,-1 , 2 ,-1],
+ # [-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 , 2 ,-1 ,-1 ,-1 , 2 ,-1],
+ # [-1 , 2 , 2 , 2 , 2 , 2 , 2 , 2 , 2 , 2 , 2 , 2 , 2 , 2 ,-1],
+ # [-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1]])
     pyplot.imshow(maze,interpolation='nearest')
     pyplot.xticks([]), pyplot.yticks([])
     pyplot.savefig("maze.png")
+    print("Generated maze:")
     print(maze)
-    sol = analyze(maze)
+    print()
 
+    print("Calculated distances: ")
+    sol = analyze(maze)
     print(sol.distances)
+    print()
+
     (rows, cols) = maze.shape
 
+    print("Calculated directions: ")
     for i in range(0, rows):
         print ("".join([item.decode('ascii') for item in sol.directions[i]]))
-    print(sol.is_reachable)
-    print(sol.path(9,13))
+    print("Is reachable ? - " + str(sol.is_reachable))
+    print("Path from [9,13] : " + str(sol.path(9,13)))
