@@ -1,7 +1,11 @@
+# Taken from https://en.wikipedia.org/wiki/Maze_generation_algorithm
+# Edited for needs of homework
 import numpy
 from numpy.random import random_integers as rand
 import matplotlib.pyplot as pyplot
 import random
+
+
 def maze(width=3, height=3, complexity=.75, density=.75):
     # Only odd shapes
     shape = ((height // 2) * 2 + 1, (width // 2) * 2 + 1)

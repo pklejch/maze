@@ -165,6 +165,7 @@ def calculateDirections(array):
 
 
 def analyze(array):
+    import numpy
     sol = solution(array.shape)
 
     sol.distances = calculateDistances(array)
