@@ -19,7 +19,6 @@ class solution:
         # im right at finnish, add start and end point
         if content == b'X':
             path.append([row, column])
-            path.append([row, column])
             return path
 
         # follow directions until the end
@@ -108,8 +107,8 @@ def calculateDistances(array):
     (rows, cols) = array.shape
     matrix = numpy.empty((rows, cols), dtype=int)
     matrix[...] = -1
-    for i in range(1, rows-1):
-        for j in range(1, cols-1):
+    for i in range(0, rows):
+        for j in range(0, cols):
             solver = pathSolver(array.shape)
             for mode in ["R","D","L","U"]:
                 solver.path(numpy.copy(array),i,j,0,mode)
@@ -122,8 +121,8 @@ def calculateDistances(array):
 def calculateDirections(array):
     (rows, cols) = array.shape
     matrix = numpy.full((rows, cols), '#', dtype=('a',1))
-    for i in range(1, rows-1):
-        for j in range(1, cols-1):
+    for i in range(0, rows):
+        for j in range(0, cols):
             content = array[i][j]
             contentD = None
             contentU = None
