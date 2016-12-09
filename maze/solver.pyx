@@ -1,6 +1,6 @@
 #cython: language_level=3
 
-#Autors: Miro Hroncok and Petr Viktorin
+#Authors: Miro Hroncok and Petr Viktorin
 
 import numpy
 cimport numpy
