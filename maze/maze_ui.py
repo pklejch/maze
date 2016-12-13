@@ -3,7 +3,6 @@
 from PyQt5 import QtWidgets, uic, QtGui, QtCore, QtSvg
 import numpy
 from solver import analyze
-import generate
 
 CELL_SIZE = 32
 
@@ -39,22 +38,24 @@ SVG_14 = QtSvg.QSvgRenderer('images/lines/14.svg')
 SVG_15 = QtSvg.QSvgRenderer('images/lines/15.svg')
 
 
+VALUE_ROLE = QtCore.Qt.UserRole
 
-VALUE_ROLE= QtCore.Qt.UserRole
 
-def pixels_to_logical(x,y):
+def pixels_to_logical(x, y):
     """return row, column"""
     return y // CELL_SIZE, x // CELL_SIZE
+
 
 def logical_to_pixels(row, column):
     return column * CELL_SIZE, row * CELL_SIZE
 
+
 class GridWidget(QtWidgets.QWidget):
-    def __init__(self,array):
+    def __init__(self, array):
         super().__init__()
         self.array = array
-        self.paths = numpy.zeros(array.shape,dtype=numpy.int8)
-        self.lines = numpy.zeros(array.shape,dtype=numpy.int8)
+        self.paths = numpy.zeros(array.shape, dtype=numpy.int8)
+        self.lines = numpy.zeros(array.shape, dtype=numpy.int8)
         self.before_last_target = 0
         # * =  rozbaleni dvojice do dvou argumentu
         size = logical_to_pixels(*array.shape)
@@ -80,22 +81,21 @@ class GridWidget(QtWidgets.QWidget):
 
         solution = analyze(self.array)
         directions = solution.directions
-        dudes_x,dudes_y = numpy.where(self.array >= 2)
+        dudes_x, dudes_y = numpy.where(self.array >= 2)
 
         tar_x, tar_y = numpy.where(self.array == 1)
         has_target = True
         if not len(tar_x) or not len(tar_y):
             has_target = False
 
-
         # mark paths
         if has_target:
             # reset paths
-            self.paths = numpy.zeros(self.array.shape,dtype=numpy.int8)
-            self.lines = numpy.zeros(self.array.shape,dtype=numpy.int8)
+            self.paths = numpy.zeros(self.array.shape, dtype=numpy.int8)
+            self.lines = numpy.zeros(self.array.shape, dtype=numpy.int8)
 
             # for each dude
-            for i in range(0,len(dudes_x)):
+            for i in range(0, len(dudes_x)):
                 dude_x = dudes_x[i]
                 dude_y = dudes_y[i]
                 # find path from dude to castle
@@ -109,12 +109,12 @@ class GridWidget(QtWidgets.QWidget):
                     step_y = step[1]
                     self.paths[step_x, step_y] = 1
 
-            for i in range(0,self.lines.shape[0]):
-                for j in range(0,self.lines.shape[1]):
-                    self.lines[i][j] = self.searchLine(i,j,self.lines.shape)
+            for i in range(0, self.lines.shape[0]):
+                for j in range(0, self.lines.shape[1]):
+                    self.lines[i][j] = self.searchLine(i, j, self.lines.shape)
         else:
-            self.paths = numpy.zeros(self.array.shape,dtype=numpy.int8)
-            self.lines = numpy.zeros(self.array.shape,dtype=numpy.int8)
+            self.paths = numpy.zeros(self.array.shape, dtype=numpy.int8)
+            self.lines = numpy.zeros(self.array.shape, dtype=numpy.int8)
 
         for row in range(row_min, row_max):
             for column in range(col_min, col_max):
@@ -125,19 +125,17 @@ class GridWidget(QtWidgets.QWidget):
                 # bila barva
                 color = QtGui.QColor(255, 255, 255)
 
-
                 # vyplnime ctverecek barvou
                 painter.fillRect(rect, QtGui.QBrush(color))
                 SVG_GRASS.render(painter, rect)
 
-
                 # draw correct line
                 if self.lines[row][column] == 1:
-                    SVG_1.render(painter,rect)
+                    SVG_1.render(painter, rect)
                 elif self.lines[row][column] == 2:
-                    SVG_2.render(painter,rect)
+                    SVG_2.render(painter, rect)
                 elif self.lines[row][column] == 3:
-                    SVG_3.render(painter,rect)
+                    SVG_3.render(painter, rect)
                 elif self.lines[row][column] == 4:
                     SVG_4.render(painter, rect)
                 elif self.lines[row][column] == 5:
@@ -179,11 +177,10 @@ class GridWidget(QtWidgets.QWidget):
                 elif self.array[row, column] == 6:
                     SVG_DUDE5.render(painter, rect)
 
-
                 # i am on the road and grass, draw direction
                 if self.paths[row][column] == 1 and self.array[row][column] == 0:
                     if directions[row][column] == b'^':
-                        SVG_UP.render(painter,rect)
+                        SVG_UP.render(painter, rect)
                     elif directions[row][column] == b'v':
                         SVG_DOWN.render(painter, rect)
                     elif directions[row][column] == b'<':
@@ -191,26 +188,26 @@ class GridWidget(QtWidgets.QWidget):
                     elif directions[row][column] == b'>':
                         SVG_RIGHT.render(painter, rect)
 
-
     def mousePressEvent(self, event):
-        row, column = pixels_to_logical(event.x(),event.y())
+        row, column = pixels_to_logical(event.x(), event.y())
         shape = self.array.shape
-        if 0<=row<shape[0] and 0 <=column < shape[1]:
+        if 0 <= row < shape[0] and 0 <= column < shape[1]:
             if event.button() == QtCore.Qt.LeftButton:
                 # click on castle
                 if self.selected == 1:
                     # seach for existing castle
                     tar = numpy.where(self.array == 1)
                     print(tar)
-                    self.array[tar[0],tar[1]] = 0
+                    self.array[tar[0], tar[1]] = 0
                 self.array[row, column] = self.selected
             elif event.button() == QtCore.Qt.RightButton:
                 self.array[row, column] = 0
             else:
                 return
-            #self.update(*logical_to_pixels(row,column),CELL_SIZE, CELL_SIZE) # prekresli novy widget, bez argumentu prekresli vse
+            # self.update(*logical_to_pixels(row,column),CELL_SIZE, CELL_SIZE) # prekresli novy widget, bez argumentu prekresli vse
             self.update()
-    def searchLine(self,row,column,shape):
+
+    def searchLine(self, row, column, shape):
 
         if self.paths[row][column] == 0:
             return 0
@@ -235,41 +232,42 @@ class GridWidget(QtWidgets.QWidget):
         else:
             path_left = None
 
-        if path_up == 1 and (path_right == 0 or path_right == None) and (path_down == 0 or path_down == None) and (path_left == 0 or path_left == None):
+        if path_up == 1 and (path_right == 0 or path_right is None) and (path_down == 0 or path_down is None) and (path_left == 0 or path_left is None):
             return 1
-        elif (path_up == 0 or path_up == None) and (path_right == 0 or path_right == None) and (path_down == 0 or path_down == None) and (path_left == 1):
+        elif (path_up == 0 or path_up is None) and (path_right == 0 or path_right is None) and (path_down == 0 or path_down is None) and (path_left == 1):
             return 2
-        elif (path_up == 1) and (path_right == 0 or path_right == None) and (path_down == 0 or path_down == None) and (path_left == 1):
+        elif (path_up == 1) and (path_right == 0 or path_right is None) and (path_down == 0 or path_down is None) and (path_left == 1):
             return 3
-        elif (path_up == 0 or path_up == None) and (path_right == 0 or path_right == None) and (path_down == 1) and (path_left == 0 or path_left == None):
+        elif (path_up == 0 or path_up is None) and (path_right == 0 or path_right is None) and (path_down == 1) and (path_left == 0 or path_left is None):
             return 4
-        elif (path_up == 1) and (path_right == 0 or path_right == None) and (path_down ==1 ) and (path_left == 0 or path_left == None):
+        elif (path_up == 1) and (path_right == 0 or path_right is None) and (path_down ==1 ) and (path_left == 0 or path_left is None):
             return 5
-        elif (path_up == 0 or path_up == None) and (path_right == 0 or path_right == None) and (path_down == 1) and (path_left == 1):
+        elif (path_up == 0 or path_up is None) and (path_right == 0 or path_right is None) and (path_down == 1) and (path_left == 1):
             return 6
-        elif (path_up == 1) and (path_right == 0 or path_right == None) and (path_down == 1) and (path_left == 1):
+        elif (path_up == 1) and (path_right == 0 or path_right is None) and (path_down == 1) and (path_left == 1):
             return 7
-        elif (path_up == 0 or path_up == None) and (path_right == 1) and (path_down == 0 or path_down == None) and (path_left == 0 or path_left == None):
+        elif (path_up == 0 or path_up is None) and (path_right == 1) and (path_down == 0 or path_down is None) and (path_left == 0 or path_left is None):
             return 8
-        elif (path_up == 1) and (path_right == 1) and (path_down == 0 or path_down == None) and (path_left ==  0 or path_left == None):
+        elif (path_up == 1) and (path_right == 1) and (path_down == 0 or path_down is None) and (path_left ==  0 or path_left is None):
             return 9
-        elif (path_up == 0 or path_up == None) and (path_right == 1) and (path_down == 0 or path_down == None) and (path_left == 1):
+        elif (path_up == 0 or path_up is None) and (path_right == 1) and (path_down == 0 or path_down is None) and (path_left == 1):
             return 10
-        elif (path_up == 1) and (path_right == 1) and (path_down == 0 or path_down == None) and (path_left == 1):
+        elif (path_up == 1) and (path_right == 1) and (path_down == 0 or path_down is None) and (path_left == 1):
             return 11
-        elif (path_up == 0 or path_up == None) and (path_right == 1) and (path_down == 1) and (path_left == 0 or path_left == None):
+        elif (path_up == 0 or path_up is None) and (path_right == 1) and (path_down == 1) and (path_left == 0 or path_left is None):
             return 12
-        elif (path_up == 1) and (path_right == 1) and (path_down == 1) and (path_left == 0 or path_left == None):
+        elif (path_up == 1) and (path_right == 1) and (path_down == 1) and (path_left == 0 or path_left is None):
             return 13
-        elif (path_up == 0 or path_up == None) and (path_right == 1) and (path_down == 1) and (path_left == 1):
+        elif (path_up == 0 or path_up is None) and (path_right == 1) and (path_down == 1) and (path_left == 1):
             return 14
         elif (path_up == 1) and (path_right == 1) and (path_down == 1) and (path_left == 1):
             return 15
 
-def new_dialog(grid,window):
+
+def new_dialog(grid, window):
     dialog = QtWidgets.QDialog(window)
     with open('newmaze.ui') as f:
-        uic.loadUi(f,dialog)
+        uic.loadUi(f, dialog)
         
     result = dialog.exec()
     if result == QtWidgets.QDialog.Rejected:
@@ -278,18 +276,19 @@ def new_dialog(grid,window):
     cols = dialog.findChild(QtWidgets.QSpinBox, 'widthBox').value()
     rows = dialog.findChild(QtWidgets.QSpinBox, 'heightBox').value()
 
+    # grid.array = generate.maze(cols,rows)
+    grid.array = numpy.zeros((rows, cols), dtype=numpy.int8)
+    grid.lines = numpy.zeros((rows, cols), dtype=numpy.int8)
+    grid.paths = numpy.zeros((rows, cols), dtype=numpy.int8)
 
-    grid.array = generate.maze(cols,rows)
-    grid.lines = numpy.zeros((rows,cols),dtype=numpy.int8)
-    grid.paths = numpy.zeros((rows,cols),dtype=numpy.int8)
-
-    size = logical_to_pixels(rows,cols)
+    size = logical_to_pixels(rows, cols)
     grid.setMinimumSize(*size)
     grid.setMaximumSize(*size)
     grid.resize(*size)
     grid.update()
 
-def save_maze(grid,window):
+
+def save_maze(grid, window):
     result = QtWidgets.QFileDialog.getSaveFileName(window)
     filepath = result[0]
 
@@ -300,10 +299,11 @@ def save_maze(grid,window):
     try:
         numpy.savetxt(filepath, grid.array)
     except:
-        QtWidgets.QMessageBox.critical(window, "Error","Error while saving maze. Check file permissions.",QtWidgets.QMessageBox.Close)
+        QtWidgets.QMessageBox.critical(window, "Error", "Error while saving maze. Check file permissions.", QtWidgets.QMessageBox.Close)
         return
 
-def load_maze(grid,window):
+
+def load_maze(grid, window):
     result = QtWidgets.QFileDialog.getOpenFileName(window)
     filepath = result[0]
 
@@ -314,14 +314,15 @@ def load_maze(grid,window):
     try:
         grid.array = numpy.loadtxt(filepath, dtype=numpy.int8)
     except:
-        QtWidgets.QMessageBox.critical(window, "Error","Error while loading maze. Check file permissions.",QtWidgets.QMessageBox.Close)
+        QtWidgets.QMessageBox.critical(window, "Error", "Error while loading maze. Check file permissions.", QtWidgets.QMessageBox.Close)
         return
-    rows,cols = grid.array.shape
-    size = logical_to_pixels(rows,cols)
+    rows, cols = grid.array.shape
+    size = logical_to_pixels(rows, cols)
     grid.setMinimumSize(*size)
     grid.setMaximumSize(*size)
     grid.resize(*size)
     grid.update()
+
 
 def show_about(window):
     text = """
@@ -329,7 +330,7 @@ def show_about(window):
 
     This program is used for editing and vizualizing mazes.
 
-    Authors: Miro Hroncok, Petr Viktorin, Petr Klejch
+    Authors: Ing. Miro Hroncok, MSc. Petr Viktorin, Bc. Petr Klejch
 
     Git repository: https://github.com/pklejch/maze
 
@@ -337,14 +338,16 @@ def show_about(window):
 
     Graphics by http://kenney.nl/
     """
-    QtWidgets.QMessageBox.about(window,"About this application",text)
+    QtWidgets.QMessageBox.about(window, "About this application", text)
 
-def addItem(image,label,value,palette):
+
+def addItem(image, label, value, palette):
     item = QtWidgets.QListWidgetItem(label)
     icon = QtGui.QIcon(image)
     item.setIcon(icon)
-    item.setData(VALUE_ROLE,value)
+    item.setData(VALUE_ROLE, value)
     palette.addItem(item)
+
 
 def main():
     app = QtWidgets.QApplication([])
@@ -367,13 +370,12 @@ def main():
     array[1, 2] = -1
     array[2, 0] = -1
 
-	#dostanu prvek z okynka
+    # dostanu prvek z okynka
     scroll_area = window.findChild(QtWidgets.QScrollArea, 'scrollArea')
-
 
     grid = GridWidget(array)
     scroll_area.setWidget(grid)
-    palette  = window.findChild(QtWidgets.QListWidget, 'palette')
+    palette = window.findChild(QtWidgets.QListWidget, 'palette')
 
     addItem('images/grass.svg', 'Grass', 0, palette)
     addItem('images/wall.svg', 'Wall', -1, palette)
@@ -384,7 +386,6 @@ def main():
     addItem('images/dude4.svg', 'Dude 4', 5, palette)
     addItem('images/dude5.svg', 'Dude 5', 6, palette)
 
-    
     def item_activated():
         for item in palette.selectedItems():
             grid.selected = item.data(VALUE_ROLE)
@@ -392,14 +393,14 @@ def main():
     palette.itemSelectionChanged.connect(item_activated)
     palette.setCurrentRow(1)
     
-    action  = window.findChild(QtWidgets.QAction, 'actionNew')
-    action.triggered.connect(lambda: new_dialog(grid,window))
+    action = window.findChild(QtWidgets.QAction, 'actionNew')
+    action.triggered.connect(lambda: new_dialog(grid, window))
 
-    action= window.findChild(QtWidgets.QAction, 'actionSave')
-    action.triggered.connect(lambda: save_maze(grid,window))
+    action = window.findChild(QtWidgets.QAction, 'actionSave')
+    action.triggered.connect(lambda: save_maze(grid, window))
 
     action = window.findChild(QtWidgets.QAction, 'actionLoad')
-    action.triggered.connect(lambda: load_maze(grid,window))
+    action.triggered.connect(lambda: load_maze(grid, window))
 
     action = window.findChild(QtWidgets.QAction, 'actionAbout')
     action.triggered.connect(lambda: show_about(window))
