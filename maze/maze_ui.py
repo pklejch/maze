@@ -2,40 +2,42 @@
 
 from PyQt5 import QtWidgets, uic, QtGui, QtCore, QtSvg
 import numpy
-from solver import analyze
+import os
+from .solver import analyze
+dir = os.path.dirname(__file__)
 
 CELL_SIZE = 32
 
-SVG_GRASS = QtSvg.QSvgRenderer('images/grass.svg')
-SVG_WALL = QtSvg.QSvgRenderer('images/wall.svg')
-SVG_CASTLE = QtSvg.QSvgRenderer('images/castle.svg')
-SVG_DUDE1 = QtSvg.QSvgRenderer('images/dude1.svg')
-SVG_DUDE2 = QtSvg.QSvgRenderer('images/dude2.svg')
-SVG_DUDE3 = QtSvg.QSvgRenderer('images/dude3.svg')
-SVG_DUDE4 = QtSvg.QSvgRenderer('images/dude4.svg')
-SVG_DUDE5 = QtSvg.QSvgRenderer('images/dude5.svg')
+SVG_GRASS = QtSvg.QSvgRenderer(os.path.join(dir, 'images/grass.svg'))
+SVG_WALL = QtSvg.QSvgRenderer(os.path.join(dir, 'images/wall.svg'))
+SVG_CASTLE = QtSvg.QSvgRenderer(os.path.join(dir, 'images/castle.svg'))
+SVG_DUDE1 = QtSvg.QSvgRenderer(os.path.join(dir, 'images/dude1.svg'))
+SVG_DUDE2 = QtSvg.QSvgRenderer(os.path.join(dir, 'images/dude2.svg'))
+SVG_DUDE3 = QtSvg.QSvgRenderer(os.path.join(dir, 'images/dude3.svg'))
+SVG_DUDE4 = QtSvg.QSvgRenderer(os.path.join(dir, 'images/dude4.svg'))
+SVG_DUDE5 = QtSvg.QSvgRenderer(os.path.join(dir, 'images/dude5.svg'))
 
-SVG_UP = QtSvg.QSvgRenderer('images/arrows/up.svg')
-SVG_DOWN = QtSvg.QSvgRenderer('images/arrows/down.svg')
-SVG_LEFT = QtSvg.QSvgRenderer('images/arrows/left.svg')
-SVG_RIGHT = QtSvg.QSvgRenderer('images/arrows/right.svg')
+SVG_UP = QtSvg.QSvgRenderer(os.path.join(dir, 'images/arrows/up.svg'))
+SVG_DOWN = QtSvg.QSvgRenderer(os.path.join(dir, 'images/arrows/down.svg'))
+SVG_LEFT = QtSvg.QSvgRenderer(os.path.join(dir, 'images/arrows/left.svg'))
+SVG_RIGHT = QtSvg.QSvgRenderer(os.path.join(dir, 'images/arrows/right.svg'))
 
 
-SVG_1 = QtSvg.QSvgRenderer('images/lines/1.svg')
-SVG_2 = QtSvg.QSvgRenderer('images/lines/2.svg')
-SVG_3 = QtSvg.QSvgRenderer('images/lines/3.svg')
-SVG_4 = QtSvg.QSvgRenderer('images/lines/4.svg')
-SVG_5 = QtSvg.QSvgRenderer('images/lines/5.svg')
-SVG_6 = QtSvg.QSvgRenderer('images/lines/6.svg')
-SVG_7 = QtSvg.QSvgRenderer('images/lines/7.svg')
-SVG_8 = QtSvg.QSvgRenderer('images/lines/8.svg')
-SVG_9 = QtSvg.QSvgRenderer('images/lines/9.svg')
-SVG_10 = QtSvg.QSvgRenderer('images/lines/10.svg')
-SVG_11 = QtSvg.QSvgRenderer('images/lines/11.svg')
-SVG_12 = QtSvg.QSvgRenderer('images/lines/12.svg')
-SVG_13 = QtSvg.QSvgRenderer('images/lines/13.svg')
-SVG_14 = QtSvg.QSvgRenderer('images/lines/14.svg')
-SVG_15 = QtSvg.QSvgRenderer('images/lines/15.svg')
+SVG_1 = QtSvg.QSvgRenderer(os.path.join(dir, 'images/lines/1.svg'))
+SVG_2 = QtSvg.QSvgRenderer(os.path.join(dir, 'images/lines/2.svg'))
+SVG_3 = QtSvg.QSvgRenderer(os.path.join(dir, 'images/lines/3.svg'))
+SVG_4 = QtSvg.QSvgRenderer(os.path.join(dir, 'images/lines/4.svg'))
+SVG_5 = QtSvg.QSvgRenderer(os.path.join(dir, 'images/lines/5.svg'))
+SVG_6 = QtSvg.QSvgRenderer(os.path.join(dir, 'images/lines/6.svg'))
+SVG_7 = QtSvg.QSvgRenderer(os.path.join(dir, 'images/lines/7.svg'))
+SVG_8 = QtSvg.QSvgRenderer(os.path.join(dir, 'images/lines/8.svg'))
+SVG_9 = QtSvg.QSvgRenderer(os.path.join(dir, 'images/lines/9.svg'))
+SVG_10 = QtSvg.QSvgRenderer(os.path.join(dir, 'images/lines/10.svg'))
+SVG_11 = QtSvg.QSvgRenderer(os.path.join(dir, 'images/lines/11.svg'))
+SVG_12 = QtSvg.QSvgRenderer(os.path.join(dir, 'images/lines/12.svg'))
+SVG_13 = QtSvg.QSvgRenderer(os.path.join(dir, 'images/lines/13.svg'))
+SVG_14 = QtSvg.QSvgRenderer(os.path.join(dir, 'images/lines/14.svg'))
+SVG_15 = QtSvg.QSvgRenderer(os.path.join(dir, 'images/lines/15.svg'))
 
 
 VALUE_ROLE = QtCore.Qt.UserRole
@@ -354,7 +356,7 @@ def main():
  
     window = QtWidgets.QMainWindow()
  
-    with open('maze.ui') as f:
+    with open(os.path.join(dir, 'maze.ui')) as f:
         uic.loadUi(f, window)
 
     array = numpy.zeros((5, 5), dtype=numpy.int8)
@@ -377,14 +379,14 @@ def main():
     scroll_area.setWidget(grid)
     palette = window.findChild(QtWidgets.QListWidget, 'palette')
 
-    addItem('images/grass.svg', 'Grass', 0, palette)
-    addItem('images/wall.svg', 'Wall', -1, palette)
-    addItem('images/castle.svg', 'Castle', 1, palette)
-    addItem('images/dude1.svg', 'Dude', 2, palette)
-    addItem('images/dude2.svg', 'Dude 2', 3, palette)
-    addItem('images/dude3.svg', 'Dude 3', 4, palette)
-    addItem('images/dude4.svg', 'Dude 4', 5, palette)
-    addItem('images/dude5.svg', 'Dude 5', 6, palette)
+    addItem(os.path.join(dir, 'images/grass.svg'), 'Grass', 0, palette)
+    addItem(os.path.join(dir, 'images/wall.svg'), 'Wall', -1, palette)
+    addItem(os.path.join(dir, 'images/castle.svg'), 'Castle', 1, palette)
+    addItem(os.path.join(dir, 'images/dude1.svg'), 'Dude', 2, palette)
+    addItem(os.path.join(dir, 'images/dude2.svg'), 'Dude 2', 3, palette)
+    addItem(os.path.join(dir, 'images/dude3.svg'), 'Dude 3', 4, palette)
+    addItem(os.path.join(dir, 'images/dude4.svg'), 'Dude 4', 5, palette)
+    addItem(os.path.join(dir, 'images/dude5.svg'), 'Dude 5', 6, palette)
 
     def item_activated():
         for item in palette.selectedItems():
