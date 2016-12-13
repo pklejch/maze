@@ -410,5 +410,3 @@ def main():
     window.show()
  
     return app.exec()
- 
-main()
