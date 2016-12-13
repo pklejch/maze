@@ -268,7 +268,7 @@ class GridWidget(QtWidgets.QWidget):
 
 def new_dialog(grid, window):
     dialog = QtWidgets.QDialog(window)
-    with open('newmaze.ui') as f:
+    with open(os.path.join(dir, 'newmaze.ui')) as f:
         uic.loadUi(f, dialog)
         
     result = dialog.exec()
