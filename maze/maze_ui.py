@@ -297,8 +297,11 @@ def save_maze(grid,window):
         return
 
     print("Saving to " + filepath)
-    numpy.savetxt(filepath, grid.array)
-
+    try:
+        numpy.savetxt(filepath, grid.array)
+    except:
+        QtWidgets.QMessageBox.critical(window, "Error","Error while saving maze. Check file permissions.",QtWidgets.QMessageBox.Close)
+        return
 
 def load_maze(grid,window):
     result = QtWidgets.QFileDialog.getOpenFileName(window)
@@ -308,7 +311,11 @@ def load_maze(grid,window):
         return
 
     print("Loading from " + filepath)
-    grid.array = numpy.loadtxt(filepath, dtype=numpy.int8)
+    try:
+        grid.array = numpy.loadtxt(filepath, dtype=numpy.int8)
+    except:
+        QtWidgets.QMessageBox.critical(window, "Error","Error while loading maze. Check file permissions.",QtWidgets.QMessageBox.Close)
+        return
     rows,cols = grid.array.shape
     size = logical_to_pixels(rows,cols)
     grid.setMinimumSize(*size)
