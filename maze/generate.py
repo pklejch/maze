@@ -34,34 +34,26 @@ def maze(width=3, height=3, complexity=.75, density=.75):
                     Z[y_ + (y - y_) // 2, x_ + (x - x_) // 2] = 1
                     x, y = x_, y_
 
-    pyplot.figure(figsize=(10, 5))
-
-    X = numpy.copy(Z)
 
 
+    #convert
     for i in range(0, shape[0]):
         for j in range(0, shape[1]):
             if Z[i][j] == 1:
                 Z[i][j] = -1
-                X[i][j] = 255
-            elif Z[i][j] == 0:
-                Z[i][j] = 2
-                X[i][j] = 50
 
 
     i=0
     j=0
     cell = Z[i][j]
-    while cell != 2:
+    while cell != 0:
         i = random.randrange(0, shape[0])
         j = random.randrange(0, shape[1])
         cell = Z[i][j]
+
+
     #finnish
-    print("Finnish is at "+str(i)+" "+str(j))
     Z[i][j]=1
-    X[i][j]=200
-    pyplot.imshow(X,interpolation='nearest')
-    pyplot.xticks([]), pyplot.yticks([])
-    #pyplot.savefig("maze.png")
+
     return Z
 

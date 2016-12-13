@@ -3,6 +3,7 @@
 from PyQt5 import QtWidgets, uic, QtGui, QtCore, QtSvg
 import numpy
 from solver import analyze
+import generate
 
 CELL_SIZE = 32
 
@@ -83,7 +84,7 @@ class GridWidget(QtWidgets.QWidget):
 
         tar_x, tar_y = numpy.where(self.array == 1)
         has_target = True
-        if not tar_x or not tar_y:
+        if not len(tar_x) or not len(tar_y):
             has_target = False
 
 
@@ -276,8 +277,9 @@ def new_dialog(grid,window):
         
     cols = dialog.findChild(QtWidgets.QSpinBox, 'widthBox').value()
     rows = dialog.findChild(QtWidgets.QSpinBox, 'heightBox').value()
-    
-    grid.array = numpy.zeros((rows,cols),dtype=numpy.int8)
+
+
+    grid.array = generate.maze(cols,rows)
     grid.lines = numpy.zeros((rows,cols),dtype=numpy.int8)
     grid.paths = numpy.zeros((rows,cols),dtype=numpy.int8)
 
